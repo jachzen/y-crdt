@@ -12,7 +12,7 @@ description = "Bindings for the Yrs native C foreign function interface"
 [dev-dependencies]
 
 [dependencies]
-yrs = { path = "../yrs", version = "0.23.1", features = ["weak"] }
+yrs = { path = "../yrs", version = "0.23.1", features = ["weak", "sync"] }
 serde_json = { version = "1.0" }
 
 [lib]

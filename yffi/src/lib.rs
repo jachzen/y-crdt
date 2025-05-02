@@ -1,3 +1,5 @@
+mod awarenessw;
+
 use std::collections::{Bound, HashMap};
 use std::ffi::{c_char, c_void, CStr, CString};
 use std::mem::{forget, ManuallyDrop, MaybeUninit};
@@ -5930,4 +5932,35 @@ pub unsafe extern "C" fn ybranch_json(branch: *mut Branch, txn: *mut Transaction
         };
         CString::new(json).unwrap().into_raw()
     }
+}
+
+pub struct YAbsolutePosition {
+    pub index: u32,
+    pub assoc: i8,
+}
+
+/* ------------------------------------------------------------------ */
+/* 9)  y_absolute_from_sticky_index(sticky*, doc*) → YAbsolutePosition* */
+/*     NULL when the sticky cannot be resolved.                        */
+/* ------------------------------------------------------------------ */
+#[no_mangle]
+pub unsafe extern "C" fn y_absolute_from_sticky_index(
+    pos: *const StickyIndex,
+    doc: *const Doc,
+) -> *mut YAbsolutePosition {
+    if pos.is_null() || doc.is_null() { return std::ptr::null_mut(); }
+    let txn = (*doc).transact();                       // readonly txn
+    match (*pos).get_offset(&txn) {
+        None => std::ptr::null_mut(),
+        Some(off) => Box::into_raw(Box::new(YAbsolutePosition {
+            index: off.index,
+            assoc: off.assoc as i8,
+        })),
+    }
+}
+
+/* 10) free helper --------------------------------------------------- */
+#[no_mangle]
+pub unsafe extern "C" fn y_absolute_position_destroy(ptr: *mut YAbsolutePosition) {
+    if !ptr.is_null() { drop(Box::from_raw(ptr)); }
 }
