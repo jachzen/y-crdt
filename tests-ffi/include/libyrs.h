@@ -329,6 +329,11 @@ typedef struct YSubscription {} YSubscription;
 
 typedef struct TransactionInner TransactionInner;
 
+typedef struct YAbsolutePosition {
+    uint32_t index;
+    int8_t assoc;
+} YAbsolutePosition;
+
 /**
  * Configuration object used by `YDoc`.
  */
@@ -2809,5 +2814,16 @@ uint8_t ybranch_alive(Branch *branch);
  * initialized locally) or doesn't have JSON representation a NULL pointer can be returned.
  */
 char *ybranch_json(Branch *branch, YTransaction *txn);
+
+/**
+ * Converts a StickyIndex into an absolute position, based on current document state.
+ * Returns NULL if the StickyIndex cannot be resolved.
+ */
+YAbsolutePosition* y_absolute_from_sticky_index(const StickyIndex* pos, const YDoc* doc);
+
+/**
+ * Destroys a YAbsolutePosition returned by `y_absolute_from_sticky_index`.
+ */
+void y_absolute_position_destroy(YAbsolutePosition* ptr);
 
 #endif
